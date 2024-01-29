@@ -6,10 +6,17 @@ import time
 
 
 BACKGROUND_COLOR = "#B1DDC6"
-df = pandas.read_csv("data/french_words.csv")
-df.to_dict(orient='records')
-learn_df = df.to_dict("records")
-chosen_word = {}
+learn_df = {}
+choosen_word = {}
+
+try:
+    data = pandas.read_csv("data/words_to_learn.csv")
+except FileNotFoundError:
+    df = pandas.read_csv("data/french_words.csv")
+    print(df)
+    learn_df = df.to_dict(orient="records")
+else:
+    learn_df = data.to_dict(orient="records")
 
 
 
@@ -29,9 +36,17 @@ def new_title():
     canvas.itemconfig(card_word, text=choose_word['English'], fill="white")
     canvas.itemconfig(card_background, image=canvas_bg)
 
+def is_know():
+    learn_df.remove(choose_word)
+    data = pandas.DataFrame(learn_df)
+    data.to_csv(path_or_buf="data/words_to_learn.csv", index=False)
+    new_word()
+
+
 window = Tk()
 window.title("Flash Card")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
+
 flip_timer = window.after(3000, func=new_title)
 
 canvas = Canvas(width=800, height=526, highlightthickness=0, bg=BACKGROUND_COLOR)
@@ -46,12 +61,10 @@ canvas.grid(column=0, row=0, columnspan=2)
 
 
 
-
-
 #Button
 
 correct_image = PhotoImage(file="images/right.png")
-correct_button = Button(image=correct_image, highlightthickness=0, command=new_word)
+correct_button = Button(image=correct_image, highlightthickness=0, command=is_know)
 correct_button.grid(row=1, column=1)
 
 wrong_image = PhotoImage(file="images/wrong.png")
