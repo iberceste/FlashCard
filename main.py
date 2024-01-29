@@ -1,8 +1,9 @@
-from tkinter import PhotoImage
 from tkinter import *
+from tkinter import messagebox
+import os
 import pandas
 import random
-import time
+
 
 
 BACKGROUND_COLOR = "#B1DDC6"
@@ -37,10 +38,18 @@ def new_title():
     canvas.itemconfig(card_background, image=canvas_bg)
 
 def is_know():
-    learn_df.remove(choose_word)
-    data = pandas.DataFrame(learn_df)
-    data.to_csv(path_or_buf="data/words_to_learn.csv", index=False)
-    new_word()
+
+    global choose_word
+    if len(learn_df) > 1:
+        learn_df.remove(choose_word)
+        data = pandas.DataFrame(learn_df)
+        data.to_csv(path_or_buf="data/words_to_learn.csv", index=False)
+
+    else:
+        messagebox.showinfo(title="There's no word to learn", message="Congratulation! You've review all the words!\nGood job, keep up the good work!\n🥳🥳🥳🥳")
+        os.remove("data/words_to_learn.csv")
+
+
 
 
 window = Tk()
@@ -48,6 +57,7 @@ window.title("Flash Card")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
 flip_timer = window.after(3000, func=new_title)
+
 
 canvas = Canvas(width=800, height=526, highlightthickness=0, bg=BACKGROUND_COLOR)
 canvas_fg = PhotoImage(file="images/card_front.png")
@@ -58,13 +68,10 @@ card_title = canvas.create_text(400, 150, text="", font=("Ariel", 40, "italic"))
 canvas.grid(column=0, row=0, columnspan=2)
 
 
-
-
-
 #Button
 
 correct_image = PhotoImage(file="images/right.png")
-correct_button = Button(image=correct_image, highlightthickness=0, command=is_know)
+correct_button = Button(image=correct_image, highlightthickness=0, command=lambda:[new_word(),is_know()])
 correct_button.grid(row=1, column=1)
 
 wrong_image = PhotoImage(file="images/wrong.png")
