@@ -8,7 +8,6 @@ import random
 
 BACKGROUND_COLOR = "#B1DDC6"
 learn_df = {}
-choosen_word = {}
 
 try:
     data = pandas.read_csv("data/words_to_learn.csv")
@@ -20,19 +19,17 @@ else:
     learn_df = data.to_dict(orient="records")
 
 
-
-def new_word():
+def create_word():
     global choose_word, flip_timer
     window.after_cancel(flip_timer)
     choose_word = random.choice(learn_df)
     canvas.itemconfig(card_title, text="French", fill="black")
     canvas.itemconfig(card_word, text=choose_word['French'], fill="black")
     canvas.itemconfig(card_background, image=canvas_fg)
-    flip_timer = window.after(3000, func=new_title)
+    flip_timer = window.after(3000, func=flip_card)
 
 
-
-def new_title():
+def flip_card():
     canvas.itemconfig(card_title, text="English", fill="white")
     canvas.itemconfig(card_word, text=choose_word['English'], fill="white")
     canvas.itemconfig(card_background, image=canvas_bg)
@@ -51,12 +48,11 @@ def is_know():
 
 
 
-
 window = Tk()
 window.title("Flash Card")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
-flip_timer = window.after(3000, func=new_title)
+flip_timer = window.after(3000, func=flip_card)
 
 
 canvas = Canvas(width=800, height=526, highlightthickness=0, bg=BACKGROUND_COLOR)
@@ -71,13 +67,12 @@ canvas.grid(column=0, row=0, columnspan=2)
 #Button
 
 correct_image = PhotoImage(file="images/right.png")
-correct_button = Button(image=correct_image, highlightthickness=0, command=lambda:[new_word(),is_know()])
+correct_button = Button(image=correct_image, highlightthickness=0, command=lambda:[create_word(), is_know()])
 correct_button.grid(row=1, column=1)
 
 wrong_image = PhotoImage(file="images/wrong.png")
-wrong_button = Button(image=wrong_image, highlightthickness=0, command=new_word)
+wrong_button = Button(image=wrong_image, highlightthickness=0, command=create_word)
 wrong_button.grid(row=1, column=0)
 
-
-new_word()
+create_word()
 window.mainloop()
